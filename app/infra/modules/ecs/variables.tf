@@ -1,0 +1,20 @@
+variable "vpc_id" {
+  type = string
+}
+
+variable "subnet_ids" {
+  type = list(string)
+}
+
+variable "alb_sg_id" {
+  type = string
+}
+
+variable "target_group_arn" {
+  type = string
+}
+
+variable "image_uri" {
+  description = "ecr image uri"
+  type        = string
+}
