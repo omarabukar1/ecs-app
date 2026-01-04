@@ -2,10 +2,11 @@ name: Build and Push to ECR
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
     paths:
-      - "app/**"
-      - ".github/workflows/build.yaml"
+      - "app/threat-composer/**"
+      - ".github/workflows/build.yml"
   workflow_dispatch:
 
 permissions:
@@ -14,18 +15,14 @@ permissions:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    outputs:
-      image_uri: ${{ steps.meta.outputs.image_uri }}
-
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials (OIDC)
@@ -34,29 +31,25 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-name: Debug - show threat-composer files
-  run: |
-    pwd
-    ls -la
-    ls -la app
-    ls -la app/threat-composer
-
-- name: Build and push (Threat Composer)
-  uses: docker/build-push-action@v5
-  with:
-    context: ./app/threat-composer
-    file: Dockerfile
-    platforms: linux/amd64
-    push: true
-    tags: |
-      ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-      ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
-
-
-      - name: Set output image uri
-        id: meta
+      - name: Debug – verify Threat Composer files
         run: |
-          echo "image_uri=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          pwd
+          ls -la
+          ls -la app
+          ls -la app/threat-composer
+          ls -la app/threat-composer/Dockerfile
+
+      - name: Build and push Docker image (Threat Composer)
+        uses: docker/build-push-action@v5
+        with:
+          context: app/threat-composer
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
