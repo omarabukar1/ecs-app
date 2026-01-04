@@ -47,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: app/threat-composer
-          file: Dockerfile
+          file: app/threat-composer/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
