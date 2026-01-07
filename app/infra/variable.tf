@@ -24,3 +24,4 @@ variable "image_uri" {
   description = "ecr repo and tag"
   type        = string
 }
+ 
