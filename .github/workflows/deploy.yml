@@ -9,73 +9,53 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-
-  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
-  ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
-  ECS_CONTAINER_NAME: ${{ secrets.ECS_CONTAINER_NAME }}
-
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Terraform Apply (update ECS to new image)
     runs-on: ubuntu-latest
 
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    defaults:
+      run:
+        working-directory: app/infra
+
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{secrets.AWS_REGION}}
+          role-session-name: github-actions-${{ github.run_number }}
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Create new task definition revision with new image
-        id: taskdef
+      - name: Set image_uri (ECR repo + head_sha tag)
+        id: image
         run: |
-          IMAGE="${ECR_REGISTRY}/${ECR_REPOSITORY}:${{ github.event.workflow_run.head_sha }}"
+          ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+          REGION="${{ secrets.AWS_REGION }}"
+          REPO="${{ secrets.ECR_REPOSITORY }}"
+          TAG="${{ github.event.workflow_run.head_sha }}"
 
-          aws ecs describe-task-definition \
-            --task-definition "$ECS_TASK_DEFINITION" \
-            --query taskDefinition > taskdef.json
+          IMAGE_URI="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${REPO}:${TAG}"
 
-          # Remove fields AWS won't accept on register
-          cat taskdef.json | jq '
-            del(
-              .taskDefinitionArn,
-              .revision,
-              .status,
-              .requiresAttributes,
-              .compatibilities,
-              .registeredAt,
-              .registeredBy
-            )
-            | (.containerDefinitions[] | select(.name=="'"$ECS_CONTAINER_NAME"'") | .image) = "'"$IMAGE"'"
-          ' > taskdef-fixed.json
+          echo "image_uri=${IMAGE_URI}" >> "$GITHUB_OUTPUT"
+          echo "Using image_uri: ${IMAGE_URI}"
 
-          NEW_TD_ARN=$(aws ecs register-task-definition \
-            --cli-input-json file://taskdef-fixed.json \
-            --query "taskDefinition.taskDefinitionArn" \
-            --output text)
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
-          echo "new_td_arn=$NEW_TD_ARN" >> $GITHUB_OUTPUT
-          echo "Deployed image: $IMAGE"
-          echo "New task definition: $NEW_TD_ARN"
+      - name: Terraform Init (S3 backend)
+        run: terraform init -input=false
 
-      - name: Update ECS service
-        run: |
-          aws ecs update-service \
-            --cluster "$ECS_CLUSTER" \
-            --service "$ECS_SERVICE" \
-            --task-definition "${{ steps.taskdef.outputs.new_td_arn }}" \
-            --force-new-deployment
+      - name: Terraform Plan
+        run: terraform plan -input=false -var="image_uri=${{ steps.image.outputs.image_uri }}"
 
-      - name: Wait for service stability
-        run: |
-          aws ecs wait services-stable \
-            --cluster "$ECS_CLUSTER" \
-            --services "$ECS_SERVICE"
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve -var="image_uri=${{ steps.image.outputs.image_uri }}"
