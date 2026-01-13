@@ -1,83 +1,105 @@
-# Threat Composer on AWS ECS
+# 🚀 ECS Application Deployment on AWS
 
-This repository contains the deployment of the **Threat Composer** application on **AWS ECS (Fargate)** using **Terraform**.
+This repository contains a production-style deployment of a containerised Node.js application on AWS using ECS (Fargate).  
+The project demonstrates Infrastructure as Code, CI/CD automation, and scalable cloud architecture following DevOps best practices.
 
-The project focuses on deploying a real-world application with secure networking, containerisation, and infrastructure-as-code, while also providing clear architectural documentation for both users and developers.
+---
+## 🌍 Live Application
+
+The application is deployed and accessible at:
+
+🔗 https://tm.omarsapp.com
 
 ---
 
-## Live Application
+## 🧱 Architecture Overview
 
-The application is publicly available at:
+The application is deployed on **AWS ECS (Fargate)** behind an **Application Load Balancer**.  
+All infrastructure is provisioned using **Terraform**, and deployments are automated using **GitHub Actions**.
 
-**https://tm.omarsapp.com**
-
-- HTTP traffic is redirected to HTTPS
-- TLS certificates are managed using AWS Certificate Manager (ACM)
-
----
-
-## Architecture Overview
-
-This project uses the following AWS services:
-
-- Amazon VPC
-- Application Load Balancer (ALB)
-- Amazon ECS (Fargate)
-- Amazon ECR
-- AWS Certificate Manager (ACM)
-- Terraform
-
-### Traffic Flow
-
-1. A user accesses the application via the public domain
-2. DNS routes traffic to the Application Load Balancer
-3. HTTP (port 80) is redirected to HTTPS (port 443)
-4. HTTPS traffic is forwarded to ECS
-5. ECS runs the Threat Composer container
-
-
-
-
-
-
+High-level flow:
+- Application traffic → Application Load Balancer
+- Load Balancer → ECS Service (Fargate)
+- CI/CD pipeline builds and deploys containers automatically
 
 ---
 
-## User Perspective
+## 🛠️ Tech Stack
 
-From a user’s point of view:
-
-- The application is accessed via a secure HTTPS URL
-- Users interact with the Threat Composer UI
-- Threat models can be created, edited, and visualised directly in the browser
-
----
-
-## Developer & DevOps Perspective
-
-From a developer or DevOps perspective:
-
-- The application runs as a Docker container
-- Images are stored in Amazon ECR
-- ECS Fargate handles container execution
-- Terraform manages all infrastructure resources
-- The ALB handles traffic routing and TLS termination
+- **Cloud:** AWS (ECS, ALB, VPC, IAM, S3, CloudWatch)
+- **Infrastructure as Code:** Terraform
+- **CI/CD:** GitHub Actions
+- **Containers:** Docker
+- **Application:** Node.js
+- **OS & Tooling:** Linux, Bash
+- **Version Control:** Git
 
 ---
 
-## Repository Structure
+## ⚙️ Key Features
+
+- Containerised Node.js application using **Docker**
+- End-to-end infrastructure provisioning with **Terraform**
+- Automated CI/CD pipeline using **GitHub Actions**
+- ECS Fargate service with **rolling deployments**
+- Application Load Balancer for traffic routing
+- Secure secrets and configuration management
+- Centralised logging and monitoring with **CloudWatch**
+
+---
+
+## 🔁 CI/CD Workflow
+
+1. Code is pushed to the repository
+2. GitHub Actions pipeline is triggered
+3. Docker image is built and pushed
+4. Terraform plans and applies infrastructure changes
+5. ECS service is updated with minimal downtime
+
+---
+
+## 📦 Repository Structure (High Level)
 
 ```text
-ecs-app/
-├── README.md
-├── .gitignore
-├── app/
-│   ├── infra/
-│   │   ├── modules/
-│   │   └── main.tf
-│   ├── threat-composer/
-│   │   ├── Dockerfile
-│   │   └── src/
-│   └── ...
-# trigger ci
+.
+├── app/                   # Node.js application source
+├── terraform/             # Infrastructure as Code
+│   ├── modules/           # Reusable Terraform modules
+│   └── environments/      # Environment-specific configuration
+├── .github/workflows/     # CI/CD pipelines
+├── Dockerfile
+└── README.md
+
+---
+
+ 🎯 Project Goals
+
+This project was built to:
+
+- Simulate real-world DevOps workflows
+- Apply Infrastructure as Code principles
+- Gain hands-on experience with AWS ECS and CI/CD
+- Demonstrate production-style cloud deployments
+
+---
+
+## 🧠 What I Learned
+
+Through building and deploying this project, I gained practical experience in:
+
+- Designing and deploying containerised applications using **AWS ECS (Fargate)**
+- Provisioning and managing cloud infrastructure using **Terraform**
+- Building automated **CI/CD pipelines** with GitHub Actions
+- Implementing rolling deployments to minimise downtime
+- Working with AWS networking concepts such as **VPCs, ALBs, and security groups**
+- Managing application configuration, secrets, and permissions securely
+- Debugging deployment issues across infrastructure, CI pipelines, and runtime services
+- Thinking about reliability, scalability, and automation in a production-style environment
+
+---
+
+## 👤 Author
+
+**Omar Abukar**  
+DevOps Engineer  
+🔗 LinkedIn: https://www.linkedin.com/in/omar-abukar-8a9746209/
