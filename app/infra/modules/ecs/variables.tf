@@ -14,7 +14,13 @@ variable "target_group_arn" {
   type = string
 }
 
-variable "image_uri" {
-  description = "ecr image uri"
+variable "ecr_repo_name" {
+  description = "ECR repository name"
   type        = string
+}
+
+variable "image_tag" {
+  description = "Image tag to use (defaults to 'latest' for local dev)"
+  type        = string
+  default     = "latest"
 }

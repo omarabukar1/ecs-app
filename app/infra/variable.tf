@@ -20,8 +20,9 @@ variable "domain_name" {
   default = "tm.omarsapp.com"
 }
 
-variable "image_uri" {
-  description = "ecr repo and tag"
+variable "image_tag" {
+  description = "ECR image tag to use (defaults to 'latest' for local dev, GitHub Actions will pass commit SHA)"
   type        = string
+  default     = "latest"
 }
  

@@ -43,6 +43,10 @@ resource "aws_iam_role_policy_attachment" "ecs_task_exec_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+data "aws_ecr_repository" "this" {
+  name = var.ecr_repo_name
+}
+
 resource "aws_ecs_task_definition" "task" {
   family                   = "ecs-app-task-tf2"
   network_mode             = "awsvpc"
@@ -54,7 +58,7 @@ resource "aws_ecs_task_definition" "task" {
   container_definitions = jsonencode([
     {
       name  = "ecs-app"
-      image = var.image_uri
+      image = "${data.aws_ecr_repository.this.repository_url}:${var.image_tag}"
       portMappings = [
         {
           containerPort = 3000

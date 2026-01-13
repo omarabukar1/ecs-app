@@ -17,16 +17,12 @@ module "alb" {
 
 module "ecs" {
   source = "./modules/ecs"
-  image_uri        = var.image_uri
-  vpc_id           = module.vpc.vpc_id
-  subnet_ids       = module.vpc.public_subnet_ids
-  alb_sg_id        = module.alb.alb_sg_id
+  ecr_repo_name   = "ecs-app"
+  image_tag       = var.image_tag
+  vpc_id          = module.vpc.vpc_id
+  subnet_ids      = module.vpc.public_subnet_ids
+  alb_sg_id       = module.alb.alb_sg_id
   target_group_arn = module.alb.target_group_arn
-}
-
-module "ecr" {
-  source    = "./modules/ecr"
-  repo_name = "ecs-app"
 }
 
 # data "aws_acm_certificate" "this" {
