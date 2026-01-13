@@ -4,13 +4,6 @@ This repository contains a production-style deployment of a containerised Node.j
 The project demonstrates Infrastructure as Code, CI/CD automation, and scalable cloud architecture following DevOps best practices.
 
 ---
-## 🌍 Live Application
-
-The application is deployed and accessible at:
-
-🔗 https://tm.omarsapp.com
-
----
 
 ## 🧱 Architecture Overview
 
@@ -21,6 +14,14 @@ High-level flow:
 - Application traffic → Application Load Balancer
 - Load Balancer → ECS Service (Fargate)
 - CI/CD pipeline builds and deploys containers automatically
+
+---
+
+## 🌍 Live Application
+
+The application is deployed and accessible at:
+
+🔗 https://tm.omarsapp.com
 
 ---
 
@@ -58,21 +59,7 @@ High-level flow:
 
 ---
 
-## 📦 Repository Structure (High Level)
-
-```text
-.
-├── app/                   # Node.js application source
-├── terraform/             # Infrastructure as Code
-│   ├── modules/           # Reusable Terraform modules
-│   └── environments/      # Environment-specific configuration
-├── .github/workflows/     # CI/CD pipelines
-├── Dockerfile
-└── README.md
-
----
-
- 🎯 Project Goals
+## 🎯 Project Goals
 
 This project was built to:
 
