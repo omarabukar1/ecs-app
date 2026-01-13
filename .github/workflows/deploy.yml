@@ -1,0 +1,56 @@
+name: Deploy to ECS
+
+on:
+  workflow_run:
+    workflows: ["Build and Push to ECR"]
+    types: [completed]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+
+    # Only deploy if the build workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    defaults:
+      run:
+        working-directory: app/infra
+
+    steps:
+      - name: Checkout repository (same commit as build)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: github-actions-${{ github.run_number }}
+
+      - name: Set image tag (commit SHA)
+        id: image
+        run: |
+          TAG="${{ github.event.workflow_run.head_sha }}"
+          echo "image_tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Deploying image with tag: ${TAG}"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -var="image_tag=${{ steps.image.outputs.image_tag }}"
+
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve -var="image_tag=${{ steps.image.outputs.image_tag }}"
