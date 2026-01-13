@@ -58,6 +58,120 @@ The application is deployed and accessible at:
 5. ECS service is updated with minimal downtime
 
 ---
+## Running the application: 
+
+### Prerequisites
+- AWS account
+- Terraform
+- Docker
+- GitHub repository
+- Domain managed via Route 53 and/or Cloudflare
+
+### 1. App
+- Cloned existing Threat Composer application repository.
+
+- Local set up:
+```bash
+yarn install
+yarn build
+yarn global add serve
+serve -s build
+
+#yarn start
+http://localhost:3000/workspaces/default/dashboard
+
+## or
+yarn global add serve
+serve -s build
+```
+
+### 2. Containerise 
+- Created a multi-stage Dockerfile inside the app.
+
+- Built the image locally using:
+```bash
+docker built -t <image name> ./app
+```
+
+- Ran the container locally, mapping the container's port 80 to port 8080 on the host:
+``` bash
+docker run -p 8080:80 <image name>
+```
+- Verified container is running using curl:
+``` bash
+cult http://localhost:8080
+```
+- Image is ready to be pushed to ECR.
+
+
+### 3. Image Registry - ECR
+- Created an AWS ECR repository.
+
+- Confirmed AWS credentials were configued:
+``` bash
+aws sts get-caller-identity
+```
+- Authenticated Docker to AWS ECR:
+``` bash
+aws ecr get-login-password --region <YOUR-REGION> \
+| docker login --username AWS --password-stdin \
+<YOUR AWS-ID>.dkr.ecr.<YOUR-REGION>.amazonaws.com
+```
+
+- Tagged image locally:
+``` bash
+docker tag <IMAGE-NAME:latest> \
+<YOU-AWS-ID>.dkr.ecr.<YOUR-REGION>.amazonaws.com/<IMAGE-NAME>
+```
+
+- Pushed the image to ECR Repository:
+``` bash
+docker push \
+<AWS-ID>.dkr.ecr.<YOUR-REGION>.amazonaws.com/<IMAGE-NAME>
+```
+### 4. Manual AWS Setup
+- The main parts of the infrastructure were first created manually using the AWS console in order to understand how the services fit together.
+
+- Created:
+  - ECS Cluster (fargate).
+  - Task definitions using the ECR Image.
+  - Application Load Balancer.
+  - Security Groups.
+  - DNS Records.
+  - ACM Certificate for HTTPS.
+
+Once the application was reachable via HTTPS, all manual resources were deleted.
+
+### 5. Terraform
+I created the the setup using modular Terraform.
+
+- Iniitialised Terraform in the directory:
+```bash
+terraform init
+```
+
+- Iteretively planned and applied infrastructure while building modules:
+``` bash
+terraform plan
+terraform apply
+```
+
+- Verified infrastructure using the ALB DNS with HTTPS endpoint:
+```bash
+curl <ALB DNS>
+curl https://<DOMAIN>
+curl https://<DOMAIN>/health
+```
+
+- Destroyed infrastructure at the end:
+``` bash
+terraform destroy
+```
+
+### CICD 
+
+
+---
 
 ## 🎯 Project Goals
 
