@@ -171,6 +171,9 @@ terraform destroy
 ```
 
 ### CICD 
+![Image Alt](https://github.com/omarabukar1/ecs-app/blob/9b1488d8556aa1ecb3947b2bc09791cc1f645e8d/images/Image%2015-01-2026%20at%2021.34.jpeg)
+
+![Image Alt](image_url)
 
 
 ---
