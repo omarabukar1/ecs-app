@@ -1,11 +1,11 @@
-# 🚀 ECS Application Deployment on AWS
+# ECS Application Deployment on AWS
 
 This repository contains a production-style deployment of a containerised Node.js application on AWS using ECS (Fargate).  
 The project demonstrates Infrastructure as Code, CI/CD automation, and scalable cloud architecture following DevOps best practices.
 
 ---
 
-## 🧱 Architecture Overview
+## Architecture Overview
 
 The application is deployed on **AWS ECS (Fargate)** behind an **Application Load Balancer**.  
 All infrastructure is provisioned using **Terraform**, and deployments are automated using **GitHub Actions**.
@@ -17,7 +17,7 @@ High-level flow:
 
 ---
 
-## 🌍 Live Application
+## Live Application
 
 The application is deployed and accessible at:
 
@@ -27,7 +27,7 @@ The application is deployed and accessible at:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Cloud:** AWS (ECS, ALB, VPC, IAM, S3, CloudWatch)
 - **Infrastructure as Code:** Terraform
@@ -39,7 +39,7 @@ The application is deployed and accessible at:
 
 ---
 
-## ⚙️ Key Features
+## Key Features
 
 - Containerised Node.js application using **Docker**
 - End-to-end infrastructure provisioning with **Terraform**
@@ -51,7 +51,7 @@ The application is deployed and accessible at:
 
 ---
 
-## 🔁 CI/CD Workflow
+## CI/CD Workflow
 
 1. Code is pushed to the repository
 2. GitHub Actions pipeline is triggered
@@ -173,12 +173,11 @@ terraform destroy
 ### CICD 
 ![Image Alt](https://github.com/omarabukar1/ecs-app/blob/9b1488d8556aa1ecb3947b2bc09791cc1f645e8d/images/Image%2015-01-2026%20at%2021.34.jpeg)
 
-![Image Alt](image_url)
-
+![Image Alt](https://github.com/omarabukar1/ecs-app/blob/3d5fed3252941c9b07b26a1bdcf1e07a3f7d687d/images/Image%2019-01-2026%20at%2021.13.jpeg)
 
 ---
 
-## 🎯 Project Goals
+## Project Goals
 
 This project was built to:
 
@@ -189,7 +188,7 @@ This project was built to:
 
 ---
 
-## 🧠 What I Learned
+## What I Learned
 
 Through building and deploying this project, I gained practical experience in:
 
